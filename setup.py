@@ -12,6 +12,7 @@ setup(
     packages=['longtask'],
     test_suite='longtask.tests',
     install_requires=['progressbar'],
+    tests_require=['mock'],
     classifiers=[
         'Intended Audience :: Developers',
         'License :: OSI Approved :: Apache Software License'

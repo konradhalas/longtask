@@ -1,76 +1,79 @@
 import unittest
-from longtask import storage, task
-
-
-class MockStorage(storage.Storage):
-
-    def load(self):
-        return {}
-
-    def save(self, data):
-        self.saved = True
-
-
-class MockTask(task.Task):
-    name = 'mock'
-    storage_class = MockStorage
-
-    def __init__(self, exception=None, raise_condition=lambda i: True, items=None, **kwargs):
-        self.exception = exception
-        self.items = items or range(10)
-        self.raise_condition = raise_condition
-        self.processed_items = []
-        super(MockTask, self).__init__(quiet=True, **kwargs)
-
-    def process_item(self, item):
-        if self.exception and self.raise_condition(item):
-            raise self.exception
-        self.processed_items.append(item)
-
-    def get_items(self):
-        return self.items
-
-    def get_item_id(self, item):
-        return item
+from mock import Mock
+from longtask import task, storage
 
 
 class TaskTest(unittest.TestCase):
 
+    def setUp(self):
+        self.MockTask = task.Task
+        self.MockTask.process_item = Mock()
+        self.MockTask.name = 'mock'
+        self.MockTask.get_items = Mock(return_value=range(10))
+        self.MockStorage = storage.Storage
+        self.MockStorage.save = Mock()
+        self.MockStorage.load = Mock(return_value={})
+        self.MockTask.storage_class = self.MockStorage
+        self.mock_task = self.MockTask(commandline=False, quiet=True)
+
     def test_run(self):
-        task = MockTask()
+        self.mock_task.run()
 
-        task.run()
-
-        self.assertEqual(task.processed, task.get_items_len())
+        self.assertTrue(self.mock_task.is_finished())
 
     def test_keyboard_interrupt(self):
-        task = MockTask(exception=KeyboardInterrupt)
+        self.mock_task.process_item = Mock(side_effect=KeyboardInterrupt)
 
-        task.run()
+        self.mock_task.run()
 
-        self.assertFalse(task.processed)
-        self.assertFalse(task.errors)
+        self.assertFalse(self.mock_task.is_finished())
 
     def test_exception(self):
-        task = MockTask(exception=Exception)
+        self.mock_task.process_item = Mock(side_effect=Exception)
 
-        task.run()
+        self.mock_task.run()
 
-        self.assertEqual(task.processed, task.get_items_len())
-        self.assertTrue(task.errors)
-
-    def test_store_error(self):
-        task = MockTask(exception=Exception)
-
-        task.run()
-
-        self.assertTrue(task.errors)
+        self.assertTrue(self.mock_task.is_finished())
+        self.assertIn('Exception', self.mock_task.errors)
+        self.assertIn(1, self.mock_task.errors['Exception'].values()[0])
 
     def test_continue(self):
-        task = MockTask(continue_task=True)
-        first_run = task.get_items_len() / 2
-        task.processed = first_run
+        self.mock_task = self.MockTask(commandline=False, quiet=True, continue_task=True)
+        first_run = self.mock_task.get_items_len() / 2
+        self.mock_task.processed = first_run
 
-        task.run()
+        self.mock_task.run()
 
-        self.assertEqual(len(task.processed_items), task.get_items_len() - first_run)
+        self.assertTrue(self.mock_task.is_finished())
+        self.assertEqual(self.mock_task.process_item.call_count, self.mock_task.get_items_len() - first_run)
+
+    def test_load_task(self):
+        self.MockStorage.load = Mock(return_value={
+            'processed': 1,
+            'items_len': 1,
+            'errors': {'Exception': {'tb': [1]}}
+        })
+
+        self.mock_task = self.MockTask(commandline=False, quiet=True, continue_task=True)
+
+        self.assertEqual(self.mock_task.processed, 1)
+        self.assertEqual(self.mock_task.items_len, 1)
+        self.assertEqual(self.mock_task.errors, {'Exception': {'tb': [1]}})
+
+    def test_save_task(self):
+        self.mock_task.run()
+
+        self.mock_task.storage.save.assert_called_once_with({
+            'processed': self.mock_task.get_items_len(),
+            'items_len': self.mock_task.get_items_len(),
+            'errors': {}
+        })
+
+    def test_rerun_errors(self):
+        self.mock_task = self.MockTask(commandline=False, quiet=True, continue_task=True, rerun_errors=True)
+        self.mock_task.errored_items = set([0])
+        self.mock_task.processed = self.mock_task.get_items_len()
+
+        self.mock_task.run()
+
+        self.mock_task.process_item.assert_called_once_with(0)
