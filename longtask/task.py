@@ -18,7 +18,7 @@ class ErrorsPercentage(ErrorsCounter):
         self.task = task
 
     def update(self, pbar):
-        return '%3d%%' % (100 * self.task.errors / self.task.get_items_len())
+        return '%3d%%' % (100 * self.task.errors / self.task.get_items_len()) # TODO format
 
 
 class PickleStorage(object):
@@ -49,6 +49,12 @@ class PickleStorage(object):
     def get_file_name(self):
         return '.{0}.task'.format(self.task.get_name())
 
+# TODO
+# start message + time
+# end message + time
+# preaty errors
+# preaty stats
+# custom stop exception
 
 class Task(object):
     storage_class = PickleStorage
@@ -63,12 +69,15 @@ class Task(object):
         parser = argparse.ArgumentParser(description='{0} task runner.'.format(self.get_name()))
         parser.add_argument('--quiet', '-q', action='store_true', help='quiet mode')
         parser.add_argument('--continue', '-c', dest='continue_task', action='store_true', help='continue task')
+        parser.add_argument('--errors', '-e', action='store_true', help='print errors')
+        parser.add_argument('--stats', '-s', action='store_true', help='print stats from last run') #TODO
         return parser
 
     def run(self):
         self.processed = 0
         self.successes = 0
         self.errors = 0
+        self.processed_run = 0
 
         progress = self.get_progress_bar()
 
@@ -81,12 +90,13 @@ class Task(object):
                     pass
                 else:
                     self.process_item(item)
+                    self.processed_run += 1
                     self.successes += 1
             except KeyboardInterrupt:
                 break
             except Exception as error:
                 self.errors += 1
-                if not self.options.quiet:
+                if not self.options.quiet and self.options.errors:
                     self.print_error(item, error)
                 self.storage.store_error(item, error)
             if not self.options.quiet:
