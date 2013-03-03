@@ -3,3 +3,5 @@ syntax: glob
 *.swp
 *.pyc
 *.task
+*.egg*
+.idea
