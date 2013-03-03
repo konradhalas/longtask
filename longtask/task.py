@@ -140,14 +140,11 @@ class Task(object):
     def get_name(self):
         return self.name
 
-    def get_items_len(self):
-        return len(self.get_items())
-
-    def get_item_name(self, item):
-        return repr(item)
-
     def get_item_id(self, item):
         return item
+
+    def get_items_len(self):
+        return len(self.get_items())
 
     def get_items(self):
         raise NotImplementedError()
