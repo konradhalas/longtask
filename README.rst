@@ -47,7 +47,7 @@ Now in directory with ``*.png`` images you can run:
 
     $ python resize.py
     [*] Starting task: resize [2013-03-03 18:36:29.953306]
-    [*] Processed: 100% (1000/1000) errors:   10% (100/1000) |#####################| Elapsed Time: 1:00:00 ETA:  1:00:00
+    [*] Processed: 100% (1000/1000) errors: 10% (100/1000) |###################| Elapsed Time: 0:00:00 ETA:  1:00:00
     [*] Finished task: resize [2013-03-03 18:36:30.080421]
     [*] Stats:
       - processed: 100% (1000/1000)
