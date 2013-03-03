@@ -7,10 +7,17 @@ Long task runner with few nice features.
 During process execution you can track changes on progress bar. If something goes wrong or you don't have time now - you
 can stop task and rerun it later. ``longtask`` collects all your task stats and store it in JSON file.
 
-Example
--------
+How to create task?
+-------------------
 
-``resize.py`` - resize many pictures:
+If you want to create task you need to implement derived class from ``longtask.Task``. You also need to override few
+things:
+
+- ``name`` - task name,
+- ``get_items()`` - this method should return you items collection,
+- ``process_item(item)`` - in this method you can process your item.
+
+Simple example - resize many pictures (``resize.py``):
 
 ::
 
