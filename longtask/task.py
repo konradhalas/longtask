@@ -76,15 +76,15 @@ class Task(object):
     def get_progress_bar(self, output):
         return progressbar.ProgressBar(
             widgets=self.get_progress_bar_widgets(),
-            maxval=self.get_items_len(),
+            maxval=self.items_len,
             fd=output.stderr
         )
 
     def get_progress_bar_widgets(self):
         return [
             '[*] Processed: ', progressbar.Percentage(), ' (', progressbar.Counter(), '/',
-            str(self.get_items_len()), ') errors: ', widgets.ErrorsPercentage(self), ' (', widgets.ErrorsCounter(self), '/',
-            str(self.get_items_len()), ') ', progressbar.Bar(), ' ', progressbar.Timer(), ' ', progressbar.ETA()]
+            str(self.items_len), ') errors: ', widgets.ErrorsPercentage(self), ' (', widgets.ErrorsCounter(self), '/',
+            str(self.items_len), ') ', progressbar.Bar(), ' ', progressbar.Timer(), ' ', progressbar.ETA()]
 
     def handle_error(self, item, error):
         if self.options.verbose:
