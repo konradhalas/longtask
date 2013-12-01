@@ -34,8 +34,8 @@ class TaskTest(unittest.TestCase):
         self.mock_task.run()
 
         self.assertTrue(self.mock_task.is_finished())
-        self.assertIn('Exception', self.mock_task.errors)
-        self.assertIn(1, self.mock_task.errors['Exception'].values()[0])
+        self.assertTrue('Exception' in self.mock_task.errors)
+        self.assertTrue(1 in self.mock_task.errors['Exception'].values()[0])
 
     def test_continue(self):
         self.mock_task = self.MockTask(commandline=False, quiet=True, continue_task=True)
