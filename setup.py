@@ -8,7 +8,7 @@ setup(
     description='Long task runner.',
     author='Konrad Hałas',
     author_email='halas.konrad@gmail.com',
-    url='https://bitbucket.org/khalas/longtask',
+    url='https://github.com/konradhalas/longtask',
     packages=['longtask'],
     test_suite='longtask.tests',
     install_requires=['progressbar'],
