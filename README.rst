@@ -1,5 +1,9 @@
+========
 longtask
---------
+========
+
+.. image:: https://travis-ci.org/konradhalas/longtask
+    :target: https://travis-ci.org/konradhalas/longtask
 
 Long task runner with few nice features.
 
