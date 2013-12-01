@@ -2,7 +2,7 @@
 longtask
 ========
 
-.. image:: https://travis-ci.org/konradhalas/longtask
+.. image:: https://travis-ci.org/konradhalas/longtask.png
     :target: https://travis-ci.org/konradhalas/longtask
 
 Long task runner with few nice features.
