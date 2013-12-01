@@ -16,4 +16,4 @@ class ErrorsCounter(TaskWidget):
 class ErrorsPercentage(TaskWidget):
 
     def update(self, _):
-        return '{:3}%'.format(100 * len(self.task.errored_items) / self.task.items_len)
+        return '{0:3}%'.format(100 * len(self.task.errored_items) / self.task.items_len)
